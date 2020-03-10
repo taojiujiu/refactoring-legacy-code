@@ -39,7 +39,7 @@ public class WalletTransaction {
 
     public boolean execute() throws InvalidTransactionException {
         if (buyerId == null || (sellerId == null || amount < 0.0)) {
-            throw new InvalidTransactionException("This is an invalid transaction");
+                throw new InvalidTransactionException("This is an invalid transaction");
         }
         if (status == STATUS.EXECUTED) return true;
         boolean isLocked = false;
