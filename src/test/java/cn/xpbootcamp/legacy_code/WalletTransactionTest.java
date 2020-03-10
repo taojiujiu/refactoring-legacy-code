@@ -24,4 +24,17 @@ class WalletTransactionTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
+
+    @Test
+    void should_throw_InvalidTransactionException_when_execute_given_sellerId_is_null() {
+        transaction = new WalletTransaction("preAssignedId", 1L, null, 3L, "orderId");
+        InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
+                () -> transaction.execute());
+
+        String expectedMessage = "This is an invalid transaction";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
 }
