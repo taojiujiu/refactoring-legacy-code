@@ -37,4 +37,19 @@ class WalletTransactionTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
+
+    //todo: Add amount is lesser than zero test case
+//    @Test
+//    void should_throw_InvalidTransactionException_when_execute_given_amount_is_null() {
+//        // todo: Need mock amount is lesser than amount
+//        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, "orderId");
+//        InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
+//                () -> transaction.execute());
+//
+//        String expectedMessage = "This is an invalid transaction";
+//        String actualMessage = exception.getMessage();
+//
+//        assertTrue(actualMessage.contains(expectedMessage));
+//    }
+
 }
