@@ -8,6 +8,8 @@ import cn.xpbootcamp.legacy_code.utils.IdGenerator;
 import cn.xpbootcamp.legacy_code.utils.RedisDistributedLock;
 
 import javax.transaction.InvalidTransactionException;
+import java.time.Clock;
+import java.time.Instant;
 
 public class WalletTransaction {
     private String id;
@@ -20,9 +22,10 @@ public class WalletTransaction {
     private STATUS status;
     private String walletTransactionId;
     private OrderRepository orderRepository;
+    Clock clock;
 
 
-    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId, OrderRepository orderRepository) {
+    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId, OrderRepository orderRepository, Clock clock) {
         if (preAssignedId != null && !preAssignedId.isEmpty()) {
             this.id = preAssignedId;
         } else {
@@ -36,14 +39,15 @@ public class WalletTransaction {
         this.productId = productId;
         this.orderId = orderId;
         this.status = STATUS.TO_BE_EXECUTED;
-        this.createdTimestamp = System.currentTimeMillis();
+        this.createdTimestamp = clock.instant().toEpochMilli();
         this.orderRepository = orderRepository;
+        this.clock = clock;
     }
 
     public boolean execute() throws InvalidTransactionException {
         this.amount = orderRepository.find(orderId).getAmount();
         if (buyerId == null || (sellerId == null || amount < 0.0)) {
-                throw new InvalidTransactionException("This is an invalid transaction");
+            throw new InvalidTransactionException("This is an invalid transaction");
         }
         if (status == STATUS.EXECUTED) return true;
         boolean isLocked = false;
@@ -55,7 +59,7 @@ public class WalletTransaction {
                 return false;
             }
             if (status == STATUS.EXECUTED) return true; // double check
-            long executionInvokedTimestamp = System.currentTimeMillis();
+            long executionInvokedTimestamp = clock.instant().toEpochMilli();
             // 交易超过20天
             if (executionInvokedTimestamp - createdTimestamp > 1728000000) {
                 this.status = STATUS.EXPIRED;
