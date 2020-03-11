@@ -1,6 +1,7 @@
 package cn.xpbootcamp.legacy_code;
 
 import cn.xpbootcamp.legacy_code.enums.STATUS;
+import cn.xpbootcamp.legacy_code.repository.OrderRepository;
 import cn.xpbootcamp.legacy_code.service.WalletService;
 import cn.xpbootcamp.legacy_code.service.WalletServiceImpl;
 import cn.xpbootcamp.legacy_code.utils.IdGenerator;
@@ -18,9 +19,10 @@ public class WalletTransaction {
     private Double amount;
     private STATUS status;
     private String walletTransactionId;
+    private OrderRepository orderRepository;
 
 
-    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId) {
+    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId, OrderRepository orderRepository) {
         if (preAssignedId != null && !preAssignedId.isEmpty()) {
             this.id = preAssignedId;
         } else {
@@ -35,9 +37,11 @@ public class WalletTransaction {
         this.orderId = orderId;
         this.status = STATUS.TO_BE_EXECUTED;
         this.createdTimestamp = System.currentTimeMillis();
+        this.orderRepository = orderRepository;
     }
 
     public boolean execute() throws InvalidTransactionException {
+        this.amount = orderRepository.find(orderId).getAmount();
         if (buyerId == null || (sellerId == null || amount < 0.0)) {
                 throw new InvalidTransactionException("This is an invalid transaction");
         }
