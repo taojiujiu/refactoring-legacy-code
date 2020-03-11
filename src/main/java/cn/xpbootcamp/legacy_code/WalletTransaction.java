@@ -23,9 +23,9 @@ public class WalletTransaction {
     private String walletTransactionId;
     private OrderRepository orderRepository;
     Clock clock;
+    WalletService walletService;
 
-
-    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId, OrderRepository orderRepository, Clock clock) {
+    public WalletTransaction(String preAssignedId, Long buyerId, Long sellerId, Long productId, String orderId, OrderRepository orderRepository, Clock clock,WalletService walletService) {
         if (preAssignedId != null && !preAssignedId.isEmpty()) {
             this.id = preAssignedId;
         } else {
@@ -42,6 +42,7 @@ public class WalletTransaction {
         this.createdTimestamp = clock.instant().toEpochMilli();
         this.orderRepository = orderRepository;
         this.clock = clock;
+        this.walletService = walletService;
     }
 
     public boolean execute() throws InvalidTransactionException {
@@ -65,7 +66,6 @@ public class WalletTransaction {
                 this.status = STATUS.EXPIRED;
                 return false;
             }
-            WalletService walletService = new WalletServiceImpl();
             String walletTransactionId = walletService.moveMoney(id, buyerId, sellerId, amount);
             if (walletTransactionId != null) {
                 this.walletTransactionId = walletTransactionId;
