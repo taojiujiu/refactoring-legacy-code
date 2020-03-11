@@ -79,18 +79,19 @@ class WalletTransactionTest {
 
 
     //todo: Add amount is lesser than zero test case
-//    @Test
-//    void should_throw_InvalidTransactionException_when_execute_given_amount_is_null() {
-//        // todo: Need mock amount is lesser than amount
-//        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, "orderId");
-//        InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
-//                () -> transaction.execute());
-//
-//        String expectedMessage = "This is an invalid transaction";
-//        String actualMessage = exception.getMessage();
-//
-//        assertTrue(actualMessage.contains(expectedMessage));
-//    }
+    @Test
+    void should_throw_InvalidTransactionException_when_execute_given_amount_is_null() {
+        // todo: Need mock amount is lesser than amount
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, "orderId",orderRepository);
+        when(orderRepository.find(anyString())).thenReturn(new Order(orderIdTest,-1));
+        InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
+                () -> transaction.execute());
+
+        String expectedMessage = "This is an invalid transaction";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
     @Test
     void should_return_false_when_execute_given_order_is_locked() throws InvalidTransactionException {
