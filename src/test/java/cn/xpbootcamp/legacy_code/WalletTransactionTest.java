@@ -63,7 +63,7 @@ class WalletTransactionTest {
 
     @Test
     void should_throw_InvalidTransactionException_when_execute_given_buyerId_is_null() {
-        transaction = new WalletTransaction("preAssignedId", null, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", null, 2L,  orderIdTest, orderRepository, clock, walletService);
         InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
                 () -> transaction.execute());
 
@@ -76,7 +76,7 @@ class WalletTransactionTest {
 
     @Test
     void should_throw_InvalidTransactionException_when_execute_given_sellerId_is_null() {
-        transaction = new WalletTransaction("preAssignedId", 1L, null, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, null,  orderIdTest, orderRepository, clock, walletService);
         InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
                 () -> transaction.execute());
 
@@ -91,7 +91,7 @@ class WalletTransactionTest {
     @Test
     void should_throw_InvalidTransactionException_when_execute_given_amount_is_null() {
         // todo: Need mock amount is lesser than amount
-        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L,  orderIdTest, orderRepository, clock, walletService);
         when(orderRepository.find(anyString())).thenReturn(new Order(orderIdTest, -1));
         InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
                 () -> transaction.execute());
@@ -104,14 +104,14 @@ class WalletTransactionTest {
 
     @Test
     void should_return_false_when_execute_given_order_is_locked() throws InvalidTransactionException {
-        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L,  orderIdTest, orderRepository, clock, walletService);
         when(redisDistributedLock.lock(anyString())).thenReturn(false);
         assertFalse(transaction.execute());
     }
 
     @Test
     void should_return_false_when_execute_given_order_created_time_earlier_than_current_time_20_days() throws InvalidTransactionException {
-        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L,  orderIdTest, orderRepository, clock, walletService);
         when(clock.instant()).thenReturn(now.plusMillis(1728000001));
         assertFalse(transaction.execute());
         verify(redisDistributedLock).unlock(anyString());
@@ -120,7 +120,7 @@ class WalletTransactionTest {
 
     @Test
     void should_return_false_when_execut_when_user_balance_not_enough() throws InvalidTransactionException {
-        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L,  orderIdTest, orderRepository, clock, walletService);
         when(walletService.moveMoney("t_preAssignedId", 1L, 2L, 30)).thenReturn(null);
         assertFalse(transaction.execute());
         verify(redisDistributedLock).unlock(anyString());
@@ -128,7 +128,7 @@ class WalletTransactionTest {
 
     @Test
     void should_return_true_when_execut_when_user_balance_enough() throws InvalidTransactionException {
-        transaction = new WalletTransaction("preAssignedId", 1L, 2L, 3L, orderIdTest, orderRepository, clock, walletService);
+        transaction = new WalletTransaction("preAssignedId", 1L, 2L,  orderIdTest, orderRepository, clock, walletService);
         when(walletService.moveMoney("t_preAssignedId", 1L, 2L, 30)).thenReturn("");
         assertTrue(transaction.execute());
         verify(redisDistributedLock).unlock(anyString());
